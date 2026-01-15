@@ -16,5 +16,20 @@ Projenin **Frontend (Arayüz)** geliştirme süreci tamamen tarafımdan yürüt�
 * **PDF Görüntüleyici:** Bildiriler kitaplarının uygulama içerisinden kolayca okunabilmesi.
 * **Modern Arayüz:** Batman Üniversitesi kurumsal kimliğine uygun tasarım.
 
+## 📸 Ekran Görüntüleri
+
+### 📱 Mobil Uygulama Görünümü
+<p align="left">
+  <img src="https://raw.githubusercontent.com/bereketis72/e-dergi/main/varl%C4%B1klar/ss%20ler/mobil%20ss%201.png" width="250" title="Mobil Ana Sayfa">
+  <img src="https://raw.githubusercontent.com/bereketis72/e-dergi/main/varl%C4%B1klar/ss%20ler/mobil%20ss%202.png" width="250" title="Mobil PDF Okuyucu">
+</p>
+
+### 💻 Web Platformu Görünümü
+<p align="center">
+  <img src="https://raw.githubusercontent.com/bereketis72/e-dergi/main/varl%C4%B1klar/ss%20ler/web%20ss%201.png" width="800" title="Web Katalog">
+  <br><br>
+  <img src="https://raw.githubusercontent.com/bereketis72/e-dergi/main/varl%C4%B1klar/ss%20ler/web%20ss%203.png" width="800" title="Web PDF Okuyucu">
+</p>
+
 ---
 *Bu çalışma bir staj projesi olup, ortak bir grup çalışmasının arayüz geliştirme aşamasını temsil etmektedir.*
