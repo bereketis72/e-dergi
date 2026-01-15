@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>E-Dergi Görüntüleyici</title>
+
+    <!-- PDF.js for rendering PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+    <!-- Turn.js for flipbook effect -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/3/turn.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Arka Plan */
+        .background-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-image: url('assets/manzara.png');
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-size: cover;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* Flipbook Container - Kitap Görünümü */
+        #flipbook-container {
+            perspective: 2500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #flipbook {
+            background: transparent;
+            box-shadow:
+                0 10px 20px rgba(0, 0, 0, 0.2),
+                0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        #flipbook .page {
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        #flipbook .page canvas {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: fill;
+        }
+
+        /* Navigation Arrows - Büyük ve Belirgin */
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.4);
+            color: white;
+            border: none;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            font-size: 28px;
+            cursor: pointer;
+            transition: all 0.2s;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-arrow:hover {
+            background: rgba(0, 0, 0, 0.6);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .nav-arrow.prev {
+            left: 15px;
+        }
+
+        .nav-arrow.next {
+            right: 15px;
+        }
+
+        /* Footer Controls - Referans Tasarıma Uygun */
+        .footer {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(40, 40, 40, 0.85);
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+        }
+
+        .footer-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .footer-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .footer-divider {
+            width: 1px;
+            height: 25px;
+            background: rgba(255, 255, 255, 0.2);
+            margin: 0 5px;
+        }
+
+        .page-indicator {
+            color: white;
+            padding: 5px 12px;
+            font-size: 13px;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        .view-label {
+            color: white;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 4px 8px;
+            background: rgba(74, 144, 217, 0.3);
+            border-radius: 4px;
+        }
+
+        .view-toggle {
+            background: rgba(74, 144, 217, 0.2) !important;
+        }
+
+        .view-toggle:hover {
+            background: rgba(74, 144, 217, 0.4) !important;
+        }
+
+        /* Loading */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(20, 20, 20, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading.hidden {
+            display: none;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-top-color: #4A90D9;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            color: white;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            body {
+                background: #1a1a1a;
+            }
+
+            .background-layer {
+                opacity: 0.3;
+            }
+
+            .main-content {
+                padding: 5px;
+                padding-bottom: 75px;
+                padding-top: 5px;
+            }
+
+            #flipbook-container {
+                width: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            #flipbook {
+                box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+                border-radius: 4px;
+            }
+
+            #flipbook .page {
+                background: white;
+            }
+
+            /* Ok butonlarını kitabın üzerine yerleştir */
+            .nav-arrow {
+                width: 44px;
+                height: 44px;
+                font-size: 20px;
+                background: rgba(0, 0, 0, 0.5);
+                border: 2px solid rgba(255, 255, 255, 0.3);
+            }
+
+            .nav-arrow.prev {
+                left: 10px;
+            }
+
+            .nav-arrow.next {
+                right: 10px;
+            }
+
+            /* Footer düzenleme */
+            .footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                transform: none;
+                border-radius: 0;
+                padding: 12px 20px;
+                gap: 12px;
+                background: rgba(30, 30, 30, 0.98);
+                justify-content: center;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .footer-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+            }
+
+            .footer-divider {
+                height: 20px;
+                margin: 0 8px;
+            }
+
+            .page-indicator {
+                font-size: 15px;
+                padding: 8px 16px;
+                font-weight: 600;
+            }
+
+            /* Mobilde görünüm değiştirme butonu GİZLİ olsun */
+            .view-toggle {
+                display: none !important;
+            }
+
+            .view-label {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Arka Plan -->
+    <div class="background-layer"></div>
+
+    <!-- Loading -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p class="loading-text">PDF yükleniyor...</p>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <button class="nav-arrow prev" onclick="prevPage()">❮</button>
+
+        <div id="flipbook-container">
+            <div id="flipbook"></div>
+        </div>
+
+        <button class="nav-arrow next" onclick="nextPage()">❯</button>
+    </main>
+
+    <!-- Footer Controls -->
+    <footer class="footer">
+        <button class="footer-btn" onclick="firstPage()" title="İlk Sayfa">⏮</button>
+        <button class="footer-btn" onclick="prevPage()" title="Önceki">◀</button>
+        <div class="footer-divider"></div>
+        <button class="footer-btn view-toggle" onclick="toggleViewMode()" title="Görünüm Değiştir"
+            id="viewToggleBtn">📖</button>
+        <span class="view-label" id="viewLabel">Çift Sayfa</span>
+        <div class="footer-divider"></div>
+        <button class="footer-btn" onclick="toggleFullscreen()" title="Tam Ekran">⛶</button>
+        <div class="footer-divider"></div>
+        <span class="page-indicator" id="page-indicator">1-2/64</span>
+        <div class="footer-divider"></div>
+        <button class="footer-btn" onclick="nextPage()" title="Sonraki">▶</button>
+        <button class="footer-btn" onclick="lastPage()" title="Son Sayfa">⏭</button>
+    </footer>
+
+    <script>
+        // PDF.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        let pdfDoc = null;
+        let totalPages = 0;
+        let currentPage = 1;
+
+        // URL'den PDF dosyasını al
+        const urlParams = new URLSearchParams(window.location.search);
+        const pdfUrl = urlParams.get('pdf') || 'assets/pdfs/DERS 8.pdf';
+        const title = urlParams.get('title') || 'E-Dergi';
+
+        document.title = title + ' - E-Dergi Görüntüleyici';
+
+        // Ekran boyutuna göre flipbook boyutunu hesapla
+        function calculateSize() {
+            const container = document.querySelector('.main-content');
+            const containerWidth = container.clientWidth - 10;
+            const containerHeight = container.clientHeight - 70;
+
+            const isMobile = window.innerWidth <= 768;
+
+            let width, height;
+
+            if (isMobile) {
+                // Mobilde HER ZAMAN tek sayfa modunu zorla
+                if (!isSinglePage) {
+                    isSinglePage = true;
+                }
+
+                // Ekranın %95'ini kullan - maksimum okunabilirlik
+                const maxWidth = containerWidth * 0.95;
+                const maxHeight = containerHeight * 0.95;
+
+                // A4 oranını koru (1:1.414)
+                // Önce yüksekliğe göre hesapla
+                height = maxHeight;
+                width = height * 0.707;
+
+                // Genişlik sığmıyorsa, genişliğe göre ayarla
+                if (width > maxWidth) {
+                    width = maxWidth;
+                    height = width * 1.414;
+                }
+            } else if (isSinglePage) {
+                // Masaüstü Tek Sayfa: Yüksekliğe tam sığacak şekilde
+                height = Math.min(containerHeight, window.innerHeight * 0.92);
+                width = height * 0.707; // A4 oranı
+            } else {
+                // Masaüstü Çift Sayfa: Geniş
+                height = Math.min(containerHeight, window.innerHeight * 0.92);
+                width = height * 1.414;
+            }
+
+            return { width, height, isMobile };
+        }
+
+        // PDF'i yükle
+        async function loadPDF() {
+            try {
+                pdfDoc = await pdfjsLib.getDocument(pdfUrl).promise;
+                totalPages = pdfDoc.numPages;
+
+                const size = calculateSize();
+                await renderAllPages(size);
+                initFlipbook(size);
+
+                document.getElementById('loading').classList.add('hidden');
+
+            } catch (error) {
+                console.error('PDF yükleme hatası:', error);
+                document.querySelector('.loading-text').textContent =
+                    'PDF yüklenemedi: ' + error.message;
+            }
+        }
+
+        // Sayfaları render et
+        async function renderAllPages(size) {
+            const flipbook = document.getElementById('flipbook');
+            flipbook.innerHTML = '';
+
+            const firstPage = await pdfDoc.getPage(1);
+            const originalViewport = firstPage.getViewport({ scale: 1 });
+
+            // Mobilde tek sayfa modunda tam genişlik kullan
+            const pageWidth = (size.isMobile || isSinglePage) ? size.width : size.width / 2;
+            // Mobilde çok daha yüksek kalite - 4x multiplier ile kristal netlikte görüntü
+            const qualityMultiplier = size.isMobile ? 4 : Math.min(window.devicePixelRatio || 2, 2.5);
+            const displayScale = pageWidth / originalViewport.width;
+            const renderScale = displayScale * qualityMultiplier;
+
+            for (let i = 1; i <= totalPages; i++) {
+                const page = await pdfDoc.getPage(i);
+                const viewport = page.getViewport({ scale: renderScale });
+                const displayViewport = page.getViewport({ scale: displayScale });
+
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                canvas.style.width = displayViewport.width + 'px';
+                canvas.style.height = displayViewport.height + 'px';
+
+                await page.render({
+                    canvasContext: context,
+                    viewport: viewport
+                }).promise;
+
+                const pageDiv = document.createElement('div');
+                pageDiv.className = 'page';
+                pageDiv.appendChild(canvas);
+                flipbook.appendChild(pageDiv);
+            }
+        }
+
+        // Turn.js başlat
+        function initFlipbook(size) {
+            const isMobile = window.innerWidth <= 768;
+
+            // Mobilde varsayılan olarak tek sayfa
+            if (isMobile) {
+                isSinglePage = true;
+            }
+
+            $('#flipbook').turn({
+                width: size.width,
+                height: size.height,
+                autoCenter: true,
+                display: isSinglePage ? 'single' : 'double',
+                acceleration: true,
+                gradients: true,
+                elevation: 50,
+                duration: 400,
+                when: {
+                    turned: function (event, page) {
+                        currentPage = page;
+                        updatePageIndicator();
+                    }
+                }
+            });
+
+            updatePageIndicator();
+        }
+
+        // Sayfa göstergesini güncelle
+        function updatePageIndicator() {
+            const isMobile = window.innerWidth <= 768;
+
+            // Eğer mobildeyse VEYA tek sayfa modundaysa (Masaüstü dahil)
+            if (isMobile || isSinglePage) {
+                document.getElementById('page-indicator').textContent =
+                    `${currentPage}/${totalPages}`;
+            } else {
+                // Çift sayfa görünümü
+                const rightPage = Math.min(currentPage + 1, totalPages);
+                document.getElementById('page-indicator').textContent =
+                    `${currentPage}-${rightPage}/${totalPages}`;
+            }
+        }
+
+        // Navigasyon
+        function nextPage() { $('#flipbook').turn('next'); }
+        function prevPage() { $('#flipbook').turn('previous'); }
+        function firstPage() { $('#flipbook').turn('page', 1); }
+        function lastPage() { $('#flipbook').turn('page', totalPages); }
+
+        // Mobilde varsayılan olarak tek sayfa - daha okunabilir
+        let isSinglePage = window.innerWidth <= 768 ? true : false;
+
+        // Görünüm Modu Değiştir (Tek Sayfa / Çift Sayfa)
+        function toggleViewMode() {
+            // Mobilde değiştirmeye izin verme
+            if (window.innerWidth <= 768) return;
+
+            isSinglePage = !isSinglePage;
+
+            // Mevcut sayfayı kaydet
+            const currentPageNum = $('#flipbook').turn('page');
+
+            // Display modunu değiştir
+            const displayMode = isSinglePage ? 'single' : 'double';
+            $('#flipbook').turn('display', displayMode);
+
+            // Yeni boyutları hesapla ve uygula
+            const size = calculateSize();
+            $('#flipbook').turn('size', size.width, size.height);
+
+            // Sayfaya geri dön
+            $('#flipbook').turn('page', currentPageNum);
+
+            // UI güncelle
+            document.getElementById('viewToggleBtn').textContent = isSinglePage ? '📄' : '📖';
+            document.getElementById('viewLabel').textContent = isSinglePage ? 'Tek Sayfa' : 'Çift Sayfa';
+
+            updatePageIndicator();
+        }
+
+        // Tam Ekran
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // Klavye
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'ArrowRight') nextPage();
+            if (e.key === 'ArrowLeft') prevPage();
+            if (e.key === 'Home') firstPage();
+            if (e.key === 'End') lastPage();
+            if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+        });
+
+        // Touch/Swipe
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; }, { passive: true });
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) diff > 0 ? nextPage() : prevPage();
+        }, { passive: true });
+
+        // Resize Handler - Ekran boyutu değişince
+        window.addEventListener('resize', function () {
+            const isMobile = window.innerWidth <= 768;
+
+            // Eğer mobildeyse ve şu an çift sayfa modundaysa -> TEK SAYFAYA ZORLA
+            if (isMobile && !isSinglePage) {
+                isSinglePage = true;
+                $('#flipbook').turn('display', 'single');
+                // Sayfa numarasını koru (gerekirse çift sayfadan teke düşerken ayarlama turn.js tarafından yapılır)
+            }
+            // İsterseniz: Masaüstüne geçince çift sayfaya dönsün mü? 
+            // Kullanıcı sadece "mobile geçince tek olsun" dedi, tersini demedi ama genelde beklenir.
+            // Şimdilik sadece mobile geçişi zorlayalım, masaüstü serbest kalsın.
+
+            // Boyutları güncelle
+            const size = calculateSize();
+            $('#flipbook').turn('size', size.width, size.height);
+
+            updatePageIndicator();
+        });
+
+        // Yükle
+        loadPDF();
+    </script>
+</body>
+
+</html>
