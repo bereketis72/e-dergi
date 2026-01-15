@@ -16,6 +16,11 @@ Projenin **Frontend (Arayüz)** geliştirme süreci tamamen tarafımdan yürüt�
 * **PDF Görüntüleyici:** Bildiriler kitaplarının uygulama içerisinden kolayca okunabilmesi.
 * **Modern Arayüz:** Batman Üniversitesi kurumsal kimliğine uygun tasarım.
 
+<img width="1919" height="942" alt="web ss 1" src="https://github.com/user-attachments/assets/fea43b7b-f653-42d4-8c2f-9405b8fc0a1f" />
+<img width="1080" height="2400" alt="mobil ss 2" src="https://github.com/user-attachments/assets/229ef7e4-4f19-4deb-b2a5-8b337a534058" />
+<img width="1080" height="2400" alt="mobil ss 1" src="https://github.com/user-attachments/assets/4ee0c12e-b72e-4309-ac35-b1857804f4c9" />
+<img width="1919" height="939" alt="web ss 3" src="https://github.com/user-attachments/assets/d02b46cf-ed4b-47b8-ae30-dad868f1eef8" />
+<img width="1919" height="944" alt="web ss 2" src="https://github.com/user-attachments/assets/2627e37e-2c86-41f0-987b-fccf041a7a10" />
 
 
 ---
