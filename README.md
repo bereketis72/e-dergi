@@ -17,7 +17,7 @@ Projenin **Frontend (Arayüz)** geliştirme süreci tamamen tarafımdan yürüt�
 * **Modern Arayüz:** Batman Üniversitesi kurumsal kimliğine uygun tasarım.
 
 ### 📱 Mobil Görünüm
-<img width="200" height="250" alt="mobil ss 2" src="https://github.com/user-attachments/assets/229ef7e4-4f19-4deb-b2a5-8b337a534058" />
+<img width="200" height="250" alt="mobil ss 1" src="https://github.com/user-attachments/assets/786a3b2d-5181-454d-8a3b-a04a0b5dcae1" />
 <img width="200" height="250" alt="mobil ss 2" src="https://github.com/user-attachments/assets/229ef7e4-4f19-4deb-b2a5-8b337a534058" />
 
 ### 💻 Web Görünüm
