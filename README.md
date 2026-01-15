@@ -1,16 +1,20 @@
-# flutter_projesi
+# Batman Üniversitesi E-Dergi Platformu
 
-A new Flutter project.
+Bu proje, staj döneminde bir grup çalışmasının parçası olarak geliştirilmiştir. Projenin amacı, Batman Üniversitesi'ne ait kongre bildiriler kitaplarını ve dergileri dijital ortamda sunan modern bir arayüz oluşturmaktır.
 
-## Getting Started
+## 🚀 Proje Hakkında
+Projenin **Frontend (Arayüz)** geliştirme süreci tamamen tarafımdan yürütülmüştür. Uygulama, **Flutter** kullanılarak geliştirilmiş olup hem **Mobil (Android/iOS)** hem de **Web** platformlarında sorunsuz çalışacak şekilde tasarlanmıştır (Responsive Tasarım).
 
-This project is a starting point for a Flutter application.
+### Kullanılan Teknolojiler
+* **Framework:** Flutter (Dart)
+* **Platformlar:** Web & Mobil uyumlu
+* **Kapsam:** Sadece Frontend (Statik verilerle çalışır).
 
-A few resources to get you started if this is your first Flutter project:
+## ✨ Özellikler
+* **Çapraz Platform:** Tek kod tabanı ile hem web hem mobil destek.
+* **Katalog Görünümü:** Dergi kapaklarının şık bir liste halinde sunulması.
+* **PDF Görüntüleyici:** Bildiriler kitaplarının uygulama içerisinden kolayca okunabilmesi.
+* **Modern Arayüz:** Batman Üniversitesi kurumsal kimliğine uygun tasarım.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+---
+*Bu çalışma bir staj projesi olup, ortak bir grup çalışmasının arayüz geliştirme aşamasını temsil etmektedir.*
