@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'pdf_viewer_page.dart';
 
-// Web için koşullu import
+
 import 'web_helper_stub.dart' if (dart.library.html) 'web_helper.dart' as web_helper;
 
 void main() {
@@ -101,15 +101,14 @@ class _KitapListesiState extends State<KitapListesi> {
     }).toList();
   }
 
-  // Kitabı yeni sekmede flipbook olarak aç (Web) veya PDF viewer'da aç (Mobile)
+
   void _kitapAc(Kitap kitap) {
     if (kIsWeb) {
       final String baseUrl = web_helper.getOrigin();
       final String flipbookUrl = '$baseUrl/flipbook.html?pdf=${Uri.encodeComponent(kitap.pdfDosya)}&title=${Uri.encodeComponent(kitap.isim)}';
       web_helper.openUrl(flipbookUrl);
     } else {
-      // Mobile için PDF viewer sayfasına git
-      Navigator.push(
+     Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => PdfViewerPage(
@@ -162,7 +161,7 @@ class _KitapListesiState extends State<KitapListesi> {
               ),
             ),
           ),
-          // İçeriğin okunabilmesi için hafif beyaz overlay
+      
           Positioned.fill(
             child: Container(
               color: Colors.white.withOpacity(0.7),
@@ -190,7 +189,7 @@ class _KitapListesiState extends State<KitapListesi> {
             child: isMobile
                 ? Column(
                     children: [
-                      // Logo ve Başlık (Mobil)
+                      // Logo ve Başlık 
                       Row(
                         children: [
                           ClipRRect(
@@ -228,7 +227,7 @@ class _KitapListesiState extends State<KitapListesi> {
                         ],
                       ),
                       const SizedBox(height: 12),
-                      // Arama Kutusu (Mobil - Tam genişlik)
+                      // Arama Kutusu
                       Container(
                         height: 40,
                         decoration: BoxDecoration(
@@ -289,7 +288,7 @@ class _KitapListesiState extends State<KitapListesi> {
                         ],
                       ),
                       const Spacer(),
-                      // Arama Kutusu (Desktop)
+                      // Arama Kutusu 
                       Container(
                         width: 250,
                         height: 40,
@@ -324,7 +323,7 @@ class _KitapListesiState extends State<KitapListesi> {
                   ),
           ),
 
-          // Kitap Grid
+     
           Expanded(
             child: Padding(
               padding: EdgeInsets.all(padding),
